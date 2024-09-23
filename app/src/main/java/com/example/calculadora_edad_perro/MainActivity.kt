@@ -1,6 +1,7 @@
 package com.example.calculadora_edad_perro
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -32,9 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import com.example.calculadora_edad_perro.ui.theme.Calculadora_edad_perroTheme
 
 class MainActivity : ComponentActivity() {
@@ -58,8 +63,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ShowLayout ( modifier: Modifier = Modifier ) {
     val imagen = painterResource(id = R.drawable.perrito)
-    var text by remember { mutableStateOf("") }
-    
+    var edad by remember { mutableStateOf("") }
+    var resultado by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,17 +80,34 @@ fun ShowLayout ( modifier: Modifier = Modifier ) {
                 .fillMaxWidth()
                 .height(300.dp)
         )
+        Text (
+            text = "Mi edad perruna \uD83D\uDC15",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(0.dp, 20.dp, 0.dp, 0.dp)
+        )
         OutlinedTextField (
-            value = text,
+            value = edad,
 
             leadingIcon = { Icon (
                 imageVector = Icons.Default.Edit,
                 contentDescription = "editIcon"
             ) },
 
-            onValueChange = { newText -> text = newText },
-            label = { Text ( text = "Your Age" ) },
-            placeholder = { Text ( text = "Enter your age" ) },
+            onValueChange = { newEdad ->
+                if ( newEdad.isDigitsOnly() ) {
+                    edad = newEdad
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Por favor, ingresa solo números",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            },
+            label = { Text ( text = "Edad Humana" ) },
+            placeholder = { Text ( text = "Edad Humana" ) },
 
             colors = OutlinedTextFieldDefaults.colors (
                 focusedBorderColor = Color.DarkGray,
@@ -95,13 +119,51 @@ fun ShowLayout ( modifier: Modifier = Modifier ) {
                 .padding(20.dp, 20.dp, 20.dp, 0.dp)
         )
         Button (
-            onClick = { /*TODO*/ },
+            onClick = {
+                var res = 0
+                res = edad.toInt() * 7
+                resultado = res.toString()
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
             modifier = Modifier
                 .width(250.dp)
                 .padding(20.dp)
         ) {
-            Text ( text = "Calculate" )
+            Text ( text = "Calcular" )
+        }
+        OutlinedTextField (
+            value = resultado,
+
+            leadingIcon = { Icon (
+                imageVector = Icons.Default.Edit,
+                contentDescription = "editIcon"
+            ) },
+
+            onValueChange = { newResultado -> resultado = newResultado },
+            label = { Text ( text = "Edad Perruna" ) },
+            placeholder = { Text ( text = "Edad Perruna" ) },
+            readOnly = true,
+
+            colors = OutlinedTextFieldDefaults.colors (
+                focusedBorderColor = Color.DarkGray,
+                unfocusedBorderColor = Color.DarkGray
+            ),
+
+            modifier = Modifier
+                .width(350.dp)
+                .padding(20.dp, 0.dp, 20.dp, 20.dp)
+        )
+        Button (
+            onClick = {
+                edad = ""
+                resultado = ""
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray),
+            modifier = Modifier
+                .width(250.dp)
+                .padding(20.dp, 0.dp, 20.dp, 30.dp)
+        ) {
+            Text ( text = "Borrar" )
         }
     }
 }
